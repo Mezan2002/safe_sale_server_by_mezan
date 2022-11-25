@@ -68,9 +68,8 @@ const run = async () => {
     // get all users API end
 
     // get all sellers API start
-    app.get("/users", async (req, res) => {
-      const role = req.query.role;
-      const query = { role: role };
+    app.get("/users/seller", async (req, res) => {
+      const query = { role: "Seller" };
       const sellers = await usersCollection.find(query).toArray();
       res.send(sellers);
     });
