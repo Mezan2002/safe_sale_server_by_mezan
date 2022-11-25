@@ -74,6 +74,14 @@ const run = async () => {
       res.send(sellers);
     });
     // get all sellers API end
+
+    // get all buyers API start
+    app.get("/users/buyer", async (req, res) => {
+      const query = { role: "Buyer" };
+      const sellers = await usersCollection.find(query).toArray();
+      res.send(sellers);
+    });
+    // get all buyers API end
   } finally {
     // console.log();
   }
