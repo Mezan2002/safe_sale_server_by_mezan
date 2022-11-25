@@ -26,6 +26,8 @@ const client = new MongoClient(uri, {
 // collections making start
 
 const categoriesCollection = client.db("safeSale").collection("categories");
+const productsCollection = client.db("safeSale").collection("products");
+const usersCollection = client.db("safeSale").collection("users");
 
 // collections making end
 
@@ -39,6 +41,40 @@ const run = async () => {
       res.send(categories);
     });
     // get all categories API end
+
+    // get signle category product API start
+    app.get("/categories/:name", async (req, res) => {
+      const name = req.params.name;
+      const query = { categoryName: name };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+    // get signle category product API end
+
+    // create users collection API start
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+    // create users collection API end
+
+    // get all users API start
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const users = await usersCollection.find(query).toArray();
+      res.send(users);
+    });
+    // get all users API end
+
+    // get all sellers API start
+    app.get("/users", async (req, res) => {
+      const role = req.query.role;
+      const query = { role: role };
+      const sellers = await usersCollection.find(query).toArray();
+      res.send(sellers);
+    });
+    // get all sellers API end
   } finally {
     // console.log();
   }
