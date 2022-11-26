@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 const app = express();
 const port = process.env.PORT || 5000;
@@ -111,6 +111,14 @@ const run = async () => {
     });
     // get a users product API end
 
+    // get advertised product API start
+    app.get("/products/advertised", async (req, res) => {
+      const query = { isAdvertised: true, status: "Available" };
+      const advertised = await productsCollection.find(query).toArray();
+      res.send(advertised);
+    });
+    // get advertised product API end
+
     // post a new product API start
     app.post("/products", async (req, res) => {
       const productsInfo = req.body;
@@ -118,6 +126,34 @@ const run = async () => {
       res.send(result);
     });
     // post a new product API end
+
+    // update a product for advertise start
+    app.patch("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          isAdvertised: true,
+        },
+      };
+      const result = await productsCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+    // update a product for advertise end
+
+    // set booked product API start
+    app.patch("/booked/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          status: "Booked",
+        },
+      };
+      const result = await productsCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+    // set booked product API end
 
     // creating jwt token API start
     app.get("/jwt", async (req, res) => {
