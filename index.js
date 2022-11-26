@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const jwt = require("jsonwebtoken");
 const app = express();
 const port = process.env.PORT || 5000;
 // requires end
@@ -28,6 +29,7 @@ const client = new MongoClient(uri, {
 const categoriesCollection = client.db("safeSale").collection("categories");
 const productsCollection = client.db("safeSale").collection("products");
 const usersCollection = client.db("safeSale").collection("users");
+const bookingsCollection = client.db("safeSale").collection("bookings");
 
 // collections making end
 
@@ -82,6 +84,38 @@ const run = async () => {
       res.send(sellers);
     });
     // get all buyers API end
+
+    // get all bookings API start
+    app.get("/bookings", async (req, res) => {
+      const userEmail = req.query.email;
+      const query = { userEmail: userEmail };
+      const bookigns = await bookingsCollection.find(query).toArray();
+      res.send(bookigns);
+    });
+    // get all bookings API end
+
+    // create all bookings API start
+    app.post("/bookings", async (req, res) => {
+      const bookings = req.body;
+      const result = await bookingsCollection.insertOne(bookings);
+      res.send(result);
+    });
+    // create all bookings API end
+
+    // creating jwt token API start
+    app.get("/jwt", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      if (user) {
+        const token = jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: "12h",
+        });
+        return res.send({ accessToken: token });
+      }
+      res.status(403).send({ message: "forbidden access" });
+    });
+    // creating jwt token API end
   } finally {
     // console.log();
   }
