@@ -102,6 +102,23 @@ const run = async () => {
     });
     // create all bookings API end
 
+    // get a users product API start
+    app.get("/products", async (req, res) => {
+      const sellerEmail = req.query.email;
+      const query = { sellerEmail: sellerEmail };
+      const products = await productsCollection.find(query).toArray();
+      res.send(products);
+    });
+    // get a users product API end
+
+    // post a new product API start
+    app.post("/products", async (req, res) => {
+      const productsInfo = req.body;
+      const result = await productsCollection.insertOne(productsInfo);
+      res.send(result);
+    });
+    // post a new product API end
+
     // creating jwt token API start
     app.get("/jwt", async (req, res) => {
       const email = req.query.email;
