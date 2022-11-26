@@ -102,6 +102,15 @@ const run = async () => {
     });
     // create all bookings API end
 
+    // delete a booking item API start
+    app.delete("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const booking = await bookingsCollection.deleteOne(query);
+      res.send(booking);
+    });
+    // delete a booking item API end
+
     // get a users product API start
     app.get("/products", async (req, res) => {
       const sellerEmail = req.query.email;
