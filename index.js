@@ -104,6 +104,16 @@ const run = async () => {
     });
     // get all buyers API end
 
+    // get product posted user start
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const query = { email: email };
+      const user = await usersCollection.find(query).toArray();
+      res.send(user);
+    });
+    // get product posted user end
+
     // get all bookings API start
     app.get("/bookings", async (req, res) => {
       const userEmail = req.query.email;
