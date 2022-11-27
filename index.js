@@ -33,6 +33,23 @@ const bookingsCollection = client.db("safeSale").collection("bookings");
 
 // collections making end
 
+// verify JWT middlewear start
+const verifyJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: "Unauthorized Access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden Access" });
+    }
+    req.decoded = decoded;
+  });
+  next();
+};
+// verify JWT middlewear end
+
 // CRUD's run function start
 const run = async () => {
   try {
@@ -48,7 +65,10 @@ const run = async () => {
     app.get("/categories/:name", async (req, res) => {
       const name = req.params.name;
       const query = { categoryName: name };
-      const result = await productsCollection.find(query).toArray();
+      const result = await productsCollection
+        .find(query)
+        .sort({ productAddedDate: -1 })
+        .toArray();
       res.send(result);
     });
     // get signle category product API end
@@ -107,7 +127,6 @@ const run = async () => {
     // get product posted user start
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
       const query = { email: email };
       const user = await usersCollection.find(query).toArray();
       res.send(user);
@@ -115,8 +134,14 @@ const run = async () => {
     // get product posted user end
 
     // get all bookings API start
-    app.get("/bookings", async (req, res) => {
+    app.get("/bookings", verifyJWT, async (req, res) => {
       const userEmail = req.query.email;
+      const decodedEmail = req.decoded.email;
+
+      if (userEmail !== decodedEmail) {
+        return res.status(403).send({ message: "Forbidden Access" });
+      }
+
       const query = { userEmail: userEmail };
       const bookigns = await bookingsCollection.find(query).toArray();
       res.send(bookigns);
