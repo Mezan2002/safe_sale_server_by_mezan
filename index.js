@@ -77,6 +77,25 @@ const run = async () => {
     });
     // get all sellers API end
 
+    // update sellers verify field start
+    app.put("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          isVerified: true,
+        },
+      };
+      const selectedUser = await usersCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(selectedUser);
+    });
+    // update sellers verify field end
+
     // get all buyers API start
     app.get("/users/buyer", async (req, res) => {
       const query = { role: "Buyer" };
