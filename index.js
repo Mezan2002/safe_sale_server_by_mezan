@@ -158,6 +158,15 @@ const run = async () => {
     });
     // get all bookings API end
 
+    // get one booking API start
+    app.get("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await bookingsCollection.findOne(query);
+      res.send(result);
+    });
+    // get one booking API end
+
     // create all bookings API start
     app.post("/bookings", async (req, res) => {
       const bookings = req.body;
